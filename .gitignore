@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### database ###
+*.db
+
+### env ###
+.env
+
+### Maven ###
+/target/
