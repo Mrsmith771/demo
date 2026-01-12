@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 350px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(100deg, #26282b 0%, #191a1c 100%);
+            color: #fff;
+            padding: 12px;
+        }
+
+        .popup {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,.2);
+        }
+
+        .header {
+            text-align: center;
+            padding: 16px;
+            background: rgba(255,255,255,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 16px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .header .version {
+            font-size: 11px;
+            opacity: .7;
+            margin-top: 4px;
+        }
+
+        .content {
+            padding: 16px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            opacity: .7;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .site-control p {
+            font-size: 12px;
+            opacity: .8;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .3s;
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .switch {
+            position: relative;
+            width: 38px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 20px;
+            transition: .3s;
+        }
+
+        .slider:before {
+            content: "";
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            left: 3px;
+            top: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: .3s;
+        }
+
+        input:checked + .slider {
+            background: rgba(255,255,255,0.6);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+
+        .user-info {
+            font-size: 12px;
+            opacity: .8;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 11px;
+            opacity: .6;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="popup">
+
+    <div class="header">
+        <h1>ADBLOCKER</h1>
+        <div class="version">v1.0.0</div>
+    </div>
+
+    <div class="content">
+
+        <div class="card">
+            <div class="stat-label">ADS BLOCKED TODAY</div>
+            <div class="stat-value" id="adsBlocked">0</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">TRACKERS STOPPED TODAY</div>
+            <div class="stat-value" id="trackersBlocked">0</div>
+        </div>
+
+        <div class="card site-control">
+            <p id="currentSite">Current site: Loading...</p>
+            <button class="btn" id="toggleSiteBtn">Disable on this site</button>
+        </div>
+
+        <div class="card">
+            <div class="toggle-item">
+                <span>Block Ads</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="toggle-item">
+                <span>Block Trackers</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="toggle-item">
+                <span>Block Popups</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="card" id="authSection">
+            <div id="loggedInView" class="hidden">
+                <div class="user-info">Logged in as <span id="userEmail"></span></div>
+                <button class="btn">Sync Settings</button>
+                <button class="btn btn-secondary">Logout</button>
+            </div>
+
+            <div id="loggedOutView">
+                <button class="btn">Login to Sync</button>
+            </div>
+        </div>
+
+        <div class="status" id="statusMsg"></div>
+    </div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
