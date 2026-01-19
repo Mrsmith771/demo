@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,14 +20,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/users/**", "/api/**")  // Disable CSRF for API endpoints
+                )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/users/register", "/users/login").permitAll()
+                        .requestMatchers("/", "/index.html", "/users/register", "/users/login",
+                                "/oauth2/**", "/login/**", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .formLogin(form -> form.disable());
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/")
+                        .defaultSuccessUrl("/oauth2/success", true)
+                        .failureUrl("/?error=oauth2_failed")
+                )
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/")
+                        .permitAll()
+                );
 
         return http.build();
     }
@@ -35,9 +45,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
