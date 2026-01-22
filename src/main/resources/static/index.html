@@ -497,6 +497,7 @@
             font-size: 12px;
             font-family: 'Courier New', monospace;
             animation: fadeIn 0.6s ease 0.2s backwards;
+            margin-bottom: 20px;
         }
 
         .log-line {
@@ -506,6 +507,231 @@
 
         .pulse {
             animation: blink 2s infinite;
+        }
+
+        .notes-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 32px;
+            margin-top: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.6s ease 0.3s backwards;
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .add-note-btn {
+            padding: 12px 24px;
+            background: rgba(96, 165, 51, 0.3);
+            border: 1px solid rgba(96, 165, 51, 0.5);
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-note-btn:hover {
+            background: rgba(96, 165, 51, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(96, 165, 51, 0.4);
+        }
+
+        .notes-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .note-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .note-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .note-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .note-item-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .note-item-content {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .note-item-meta {
+            font-size: 11px;
+            opacity: 0.5;
+            margin-bottom: 12px;
+        }
+
+        .note-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .note-action-btn {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .note-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .note-action-btn.delete {
+            background: rgba(232, 66, 66, 0.2);
+            border-color: rgba(232, 66, 66, 0.4);
+        }
+
+        .note-action-btn.delete:hover {
+            background: rgba(232, 66, 66, 0.4);
+        }
+
+        .note-form {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .note-form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .note-form-header span {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+        }
+
+        .note-input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+
+        .note-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .note-textarea {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            min-height: 200px;
+            resize: vertical;
+            margin-bottom: 16px;
+        }
+
+        .note-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .note-form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .save-note-btn, .cancel-note-btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid;
+        }
+
+        .save-note-btn {
+            background: rgba(96, 165, 51, 0.3);
+            border-color: rgba(96, 165, 51, 0.5);
+            color: #fff;
+        }
+
+        .save-note-btn:hover {
+            background: rgba(96, 165, 51, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .cancel-note-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .cancel-note-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -669,6 +895,31 @@
         <div class="log-line">✓ Encrypted connection (AES-256)</div>
         <div class="log-line pulse">✓ System ready</div>
     </div>
+
+    <div class="notes-section">
+        <div class="section-title">My Notes</div>
+        <div class="notes-header">
+            <button class="add-note-btn" onclick="showAddNoteForm()">+ Add Note</button>
+        </div>
+        
+        <div class="notes-list" id="notesList">
+            <!-- Notes will be loaded here -->
+        </div>
+
+        <!-- Add/Edit Note Form -->
+        <div class="note-form hidden" id="noteForm">
+            <div class="note-form-header">
+                <span id="noteFormTitle">Add New Note</span>
+                <button class="close-btn" onclick="hideNoteForm()">×</button>
+            </div>
+            <input type="text" class="note-input" id="noteTitleInput" placeholder="Note title..." maxlength="255">
+            <textarea class="note-textarea" id="noteContentInput" placeholder="Note content..." maxlength="10000"></textarea>
+            <div class="note-form-actions">
+                <button class="save-note-btn" onclick="saveNote()">Save</button>
+                <button class="cancel-note-btn" onclick="hideNoteForm()">Cancel</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -735,7 +986,7 @@
 
         showTerminal('Establishing secure connection...');
 
-        fetch('/users/login', {
+        fetch('/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -744,13 +995,13 @@
         })
             .then(response => response.json())
             .then(data => {
-                if (data.message === 'Login successful') {
+                if (data.message === 'Login successful' && data.token) {
                     showTerminal('ACCESS GRANTED. Welcome to the system...');
                     currentUser = email;
 
                     // Save to localStorage
                     localStorage.setItem('userEmail', email);
-                    localStorage.setItem('authToken', data.token || 'session-active');
+                    localStorage.setItem('authToken', data.token);
                     localStorage.setItem('isAuthenticated', 'true');
 
                     setTimeout(() => {
@@ -758,6 +1009,7 @@
                         document.getElementById('dashboardContainer').classList.remove('hidden');
                         document.getElementById('currentUser').textContent = currentUser;
                         loadDashboardStats();
+                        loadNotes();
                     }, 1000);
                 } else {
                     showTerminal('ACCESS DENIED: ' + data.message);
@@ -811,6 +1063,7 @@
                         document.getElementById('dashboardContainer').classList.remove('hidden');
                         document.getElementById('currentUser').textContent = currentUser;
                         loadDashboardStats();
+                        loadNotes();
                     }, 1000);
                 } else {
                     showTerminal('REGISTRATION FAILED: ' + data.message);
@@ -882,11 +1135,12 @@
         if (oauth2Success === 'success' && email) {
             // OAuth2 login successful
             currentUser = name || email;
+            const token = urlParams.get('token');
 
             // Save to localStorage
             localStorage.setItem('userEmail', email);
             localStorage.setItem('userName', name || email);
-            localStorage.setItem('authToken', 'oauth2-session');
+            localStorage.setItem('authToken', token || 'oauth2-session');
             localStorage.setItem('isAuthenticated', 'true');
 
             // Show dashboard
@@ -894,6 +1148,7 @@
             document.getElementById('dashboardContainer').classList.remove('hidden');
             document.getElementById('currentUser').textContent = currentUser;
             loadDashboardStats();
+            loadNotes();
 
             // Clean URL
             window.history.replaceState({}, document.title, '/');
@@ -911,8 +1166,202 @@
             document.getElementById('dashboardContainer').classList.remove('hidden');
             document.getElementById('currentUser').textContent = currentUser;
             loadDashboardStats();
+            loadNotes();
         }
     });
+
+    // Notes functionality
+    let editingNoteId = null;
+
+    function getAuthHeaders() {
+        const token = localStorage.getItem('authToken');
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        // Only add Authorization header if we have a JWT token (not oauth2-session)
+        if (token && token !== 'oauth2-session' && token !== 'session-active') {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        return headers;
+    }
+
+    function loadNotes() {
+        const notesList = document.getElementById('notesList');
+        if (!notesList) return;
+        
+        notesList.innerHTML = '<div style="text-align: center; opacity: 0.5; padding: 20px;">Loading notes...</div>';
+
+        fetch('/notes', {
+            method: 'GET',
+            headers: getAuthHeaders(),
+            credentials: 'include'  // Include cookies for OAuth2 session
+        })
+            .then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error('Unauthorized - please login again');
+                }
+                if (!response.ok) {
+                    throw new Error('Failed to load notes');
+                }
+                return response.json();
+            })
+            .then(data => {
+                notesList.innerHTML = '';
+                if (data.notes && data.notes.length > 0) {
+                    data.notes.forEach(note => {
+                        const noteElement = createNoteElement(note);
+                        notesList.appendChild(noteElement);
+                    });
+                } else {
+                    notesList.innerHTML = '<div style="text-align: center; opacity: 0.5; padding: 20px;">No notes yet. Click "Add Note" to create one.</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading notes:', error);
+                notesList.innerHTML = '<div style="text-align: center; opacity: 0.5; padding: 20px; color: rgba(232, 66, 66, 0.8);">Failed to load notes: ' + error.message + '</div>';
+            });
+    }
+
+    function createNoteElement(note) {
+        const div = document.createElement('div');
+        div.className = 'note-item';
+        
+        const date = new Date(note.createdAt || note.updatedAt);
+        const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+
+        div.innerHTML = `
+            <div class="note-item-header">
+                <div class="note-item-title">${escapeHtml(note.title)}</div>
+            </div>
+            <div class="note-item-content">${escapeHtml(note.content)}</div>
+            <div class="note-item-meta">Created: ${formattedDate}</div>
+            <div class="note-item-actions">
+                <button class="note-action-btn" onclick="editNote(${note.id})">Edit</button>
+                <button class="note-action-btn delete" onclick="deleteNote(${note.id})">Delete</button>
+            </div>
+        `;
+        return div;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showAddNoteForm() {
+        editingNoteId = null;
+        document.getElementById('noteFormTitle').textContent = 'Add New Note';
+        document.getElementById('noteTitleInput').value = '';
+        document.getElementById('noteContentInput').value = '';
+        document.getElementById('noteForm').classList.remove('hidden');
+    }
+
+    function hideNoteForm() {
+        document.getElementById('noteForm').classList.add('hidden');
+        editingNoteId = null;
+    }
+
+    function editNote(noteId) {
+        fetch(`/notes/${noteId}`, {
+            method: 'GET',
+            headers: getAuthHeaders(),
+            credentials: 'include'
+        })
+            .then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error('Unauthorized');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.id) {
+                    editingNoteId = data.id;
+                    document.getElementById('noteFormTitle').textContent = 'Edit Note';
+                    document.getElementById('noteTitleInput').value = data.title || '';
+                    document.getElementById('noteContentInput').value = data.content || '';
+                    document.getElementById('noteForm').classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading note:', error);
+                alert('Failed to load note for editing: ' + error.message);
+            });
+    }
+
+    function saveNote() {
+        const title = document.getElementById('noteTitleInput').value.trim();
+        const content = document.getElementById('noteContentInput').value.trim();
+
+        if (!title || !content) {
+            alert('Title and content are required');
+            return;
+        }
+
+        const url = editingNoteId ? `/notes/${editingNoteId}` : '/notes';
+        const method = editingNoteId ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ title, content }),
+            credentials: 'include'  // Include cookies for OAuth2 session
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('Unauthorized - please login again');
+                }
+                if (response.status === 403) {
+                    throw new Error('Access denied');
+                }
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to save note');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideNoteForm();
+                loadNotes();
+            })
+            .catch(error => {
+                console.error('Error saving note:', error);
+                alert('Failed to save note: ' + error.message);
+            });
+    }
+
+    function deleteNote(noteId) {
+        if (!confirm('Are you sure you want to delete this note?')) {
+            return;
+        }
+
+        fetch(`/notes/${noteId}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+            credentials: 'include'  // Include cookies for OAuth2 session
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('Unauthorized - please login again');
+                }
+                if (response.status === 403) {
+                    throw new Error('Access denied');
+                }
+                if (response.ok) {
+                    loadNotes();
+                } else {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to delete note');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting note:', error);
+                alert('Failed to delete note: ' + error.message);
+            });
+    }
 </script>
 </body>
 </html>

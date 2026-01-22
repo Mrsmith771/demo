@@ -2,6 +2,7 @@ package com.example.demo.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -82,16 +83,40 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    // Handle AccessDeniedException (403)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+            AccessDeniedException ex,
+            WebRequest request) {
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden",
+                ex.getMessage() != null ? ex.getMessage() : "Access denied",
+                LocalDateTime.now(),
+                request.getDescription(false).replace("uri=", ""),
+                null
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
     // Handle generic exceptions (500)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex,
             WebRequest request) {
 
+        // Don't expose stack traces in production
+        String message = "An unexpected error occurred";
+        if (ex.getMessage() != null && !ex.getMessage().contains("Exception")) {
+            message = ex.getMessage();
+        }
+
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
-                "An unexpected error occurred: " + ex.getMessage(),
+                message,
                 LocalDateTime.now(),
                 request.getDescription(false).replace("uri=", ""),
                 null
