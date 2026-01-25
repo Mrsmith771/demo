@@ -889,13 +889,6 @@
         </div>
     </div>
 
-    <div class="system-log">
-        <div class="log-line">✓ All protection protocols active</div>
-        <div class="log-line">✓ Firewall online</div>
-        <div class="log-line">✓ Encrypted connection (AES-256)</div>
-        <div class="log-line pulse">✓ System ready</div>
-    </div>
-
     <div class="notes-section">
         <div class="section-title">My Notes</div>
         <div class="notes-header">
@@ -1048,14 +1041,14 @@
         })
             .then(response => response.json())
             .then(data => {
-                if (data.message === 'User created successfully') {
+                if (data.message === 'User created successfully' && data.token) {  // ← Проверяем токен
                     showTerminal('ACCESS GRANTED. Account created successfully...');
                     currentUser = username;
 
-                    // Save to localStorage
+                    // Save to localStorage С ТОКЕНОМ
                     localStorage.setItem('userEmail', email);
                     localStorage.setItem('userName', username);
-                    localStorage.setItem('authToken', 'session-active');
+                    localStorage.setItem('authToken', data.token);  // ← ВАЖНО: сохраняем РЕАЛЬНЫЙ токен!
                     localStorage.setItem('isAuthenticated', 'true');
 
                     setTimeout(() => {
@@ -1078,6 +1071,12 @@
     function handleLogout() {
         showTerminal('Logging out... Session terminated');
 
+        // Call server logout to clear session
+        fetch('/logout', {
+            method: 'POST',
+            credentials: 'include'
+        }).catch(err => console.log('Logout error:', err));
+
         // Clear localStorage
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userName');
@@ -1085,17 +1084,9 @@
         localStorage.removeItem('isAuthenticated');
 
         setTimeout(() => {
-            document.getElementById('loginContainer').classList.remove('hidden');
-            document.getElementById('dashboardContainer').classList.add('hidden');
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('registerUsername').value = '';
-            document.getElementById('registerEmail').value = '';
-            document.getElementById('registerPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-            currentUser = '';
-            switchTab('login');
-        }, 1000);
+            // Reload page to clear any session data
+            window.location.reload();
+        }, 500);
     }
 
     function loadDashboardStats() {

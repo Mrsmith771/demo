@@ -1,39 +1,40 @@
 package com.example.demo.security;
 
 import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
-import org.springframework.security.core.GrantedAuthority;
+import com.example.demo.service.UserService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public MyUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public MyUserDetailsService(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        Optional<User> userOpt = userService.findByEmail(email);
 
-        Collection<? extends GrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority(user.getRole() != null ? user.getRole() : "ROLE_USER")
-        );
+        if (userOpt.isEmpty()) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+
+        User user = userOpt.get();
+        String role = user.getRole() != null ? user.getRole() : "ROLE_USER";
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password(user.getPassword())
-                .authorities(authorities)
+                .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
                 .build();
     }
 }

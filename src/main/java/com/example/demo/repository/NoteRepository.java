@@ -104,7 +104,13 @@ public class NoteRepository {
 
     public List<Note> findByUserId(Long userId) {
         String sql = "SELECT * FROM notes WHERE user_id = ? ORDER BY updated_at DESC";
-        return jdbcTemplate.query(sql, ps -> ps.setLong(1, userId), noteRowMapper);
+        System.out.println("NoteRepository.findByUserId - querying for userId: " + userId);
+        List<Note> notes = jdbcTemplate.query(sql, ps -> ps.setLong(1, userId), noteRowMapper);
+        System.out.println("NoteRepository.findByUserId - found " + notes.size() + " notes");
+        for (Note note : notes) {
+            System.out.println("  Note id: " + note.getId() + ", userId: " + note.getUserId() + ", title: " + note.getTitle());
+        }
+        return notes;
     }
 
     public boolean deleteById(Long id) {

@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.security.CustomOAuth2UserService;
 import com.example.demo.security.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,8 +8,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -23,9 +22,11 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomOAuth2UserService customOAuth2UserService) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     @Bean
@@ -46,14 +47,17 @@ public class SecurityConfig {
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()  // OAuth2 endpoints
                         // Admin endpoints
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // User endpoints
-                        .requestMatchers("/user/**", "/notes/**").hasAnyRole("USER", "ADMIN")
+                        // User endpoints - allow both ROLE_USER and OIDC_USER (OAuth2)
+                        .requestMatchers("/user/**", "/notes/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "OIDC_USER")
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
                         .defaultSuccessUrl("/oauth2/success", true)
                         .failureUrl("/?error=oauth2_failed")
                 )
@@ -78,8 +82,4 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);  // Strength parameter 12 for stronger hashing
-    }
 }

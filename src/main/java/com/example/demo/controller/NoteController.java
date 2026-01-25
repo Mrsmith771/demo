@@ -31,13 +31,15 @@ public class NoteController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN', 'OIDC_USER')")
     public ResponseEntity<Map<String, Object>> createNote(
             @Valid @RequestBody NoteDTO noteDTO,
             Authentication authentication) {
 
         Long userId = getUserIdFromAuthentication(authentication);
+        System.out.println("Creating note for userId: " + userId);
         Note note = noteService.createNote(noteDTO, userId);
+        System.out.println("Created note - id: " + note.getId() + ", userId: " + note.getUserId() + ", title: " + note.getTitle());
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Note created successfully");
@@ -51,10 +53,13 @@ public class NoteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN', 'OIDC_USER')")
     public ResponseEntity<Map<String, Object>> getAllNotes(Authentication authentication) {
         Long userId = getUserIdFromAuthentication(authentication);
+        System.out.println("Getting notes for userId: " + userId);
+        System.out.println("Authentication name: " + authentication.getName());
         List<Note> notes = noteService.getAllNotesByUserId(userId);
+        System.out.println("Found " + notes.size() + " notes for userId: " + userId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("notes", notes);
@@ -64,7 +69,7 @@ public class NoteController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN', 'OIDC_USER')")
     public ResponseEntity<Map<String, Object>> getNoteById(
             @PathVariable Long id,
             Authentication authentication) {
@@ -98,7 +103,7 @@ public class NoteController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN', 'OIDC_USER')")
     public ResponseEntity<Map<String, Object>> updateNote(
             @PathVariable Long id,
             @Valid @RequestBody NoteDTO noteDTO,
@@ -129,7 +134,7 @@ public class NoteController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN', 'OIDC_USER')")
     public ResponseEntity<Map<String, Object>> deleteNote(
             @PathVariable Long id,
             Authentication authentication) {
@@ -161,13 +166,32 @@ public class NoteController {
             throw new AccessDeniedException("User not authenticated");
         }
 
-        String email = authentication.getName();
+        String email = null;
+        
+        // Handle OAuth2 authentication
+        if (authentication.getPrincipal() instanceof org.springframework.security.oauth2.core.user.OAuth2User) {
+            org.springframework.security.oauth2.core.user.OAuth2User oauth2User = 
+                (org.springframework.security.oauth2.core.user.OAuth2User) authentication.getPrincipal();
+            email = oauth2User.getAttribute("email");
+            System.out.println("OAuth2 authentication - email: " + email);
+        } else {
+            // Handle regular JWT/username authentication
+            email = authentication.getName();
+            System.out.println("JWT authentication - email: " + email);
+        }
+
+        if (email == null || email.isEmpty()) {
+            throw new AccessDeniedException("Email not found in authentication");
+        }
+
         Optional<User> userOpt = userService.findByEmail(email);
 
         if (userOpt.isEmpty()) {
-            throw new AccessDeniedException("User not found");
+            throw new AccessDeniedException("User not found for email: " + email);
         }
 
-        return userOpt.get().getId();
+        User user = userOpt.get();
+        System.out.println("Found user - id: " + user.getId() + ", email: " + user.getEmail());
+        return user.getId();
     }
 }
