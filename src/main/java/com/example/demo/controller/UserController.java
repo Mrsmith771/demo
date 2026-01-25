@@ -42,7 +42,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        // ВАЖНО: Инвалидируем старую OAuth2 сессию
+        // IMPORTANT: Invalidate the old OAuth2 session
         HttpSession session = request.getSession(false);
         if (session != null) {
             System.out.println("Invalidating existing session for registration");
