@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,23 +35,46 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/auth/**", "/users/register", "/notes/**")  // Disable CSRF for API endpoints
-                        // CSRF is enabled by default for other endpoints
+                        .ignoringRequestMatchers("/auth/**", "/users/register", "/notes/**", "/api/stats/**")
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)  // Allow sessions for OAuth2
+
+                //SECURITY HEADERS
+                .headers(headers -> headers
+                        // X-Content-Type-Options: nosniff
+                        .contentTypeOptions(contentTypeOptions -> {})
+
+                        // X-Frame-Options: DENY
+                        .frameOptions(frameOptions -> frameOptions.deny())
+
+                        // Content-Security-Policy
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'")
+                        )
+
+                        // Referrer-Policy: strict-origin-when-cross-origin
+                        .referrerPolicy(referrer -> referrer
+                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                        )
+
+                        // X-XSS-Protection: 1; mode=block (legacy but still useful)
+                        .xssProtection(xss -> xss
+                                .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
+                        )
                 )
+
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        //Cookie settings
+                        .sessionFixation().changeSessionId()
+                )
+
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
                         .requestMatchers("/", "/index.html", "/error").permitAll()
                         .requestMatchers("/auth/**", "/users/register", "/users/login").permitAll()
-                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()  // OAuth2 endpoints
-                        // Admin endpoints
+                        .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // User endpoints - allow both ROLE_USER and OIDC_USER (OAuth2)
                         .requestMatchers("/user/**", "/notes/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "OIDC_USER")
-                        // All other requests require authentication
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -63,6 +88,8 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
+                        .deleteCookies("JSESSIONID")
+                        .invalidateHttpSession(true)
                         .permitAll()
                 );
 
@@ -81,5 +108,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }

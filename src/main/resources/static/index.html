@@ -330,6 +330,9 @@
             display: flex;
             align-items: center;
             font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.5;
         }
 
         .cursor::after {
@@ -894,7 +897,7 @@
         <div class="notes-header">
             <button class="add-note-btn" onclick="showAddNoteForm()">+ Add Note</button>
         </div>
-        
+
         <div class="notes-list" id="notesList">
             <!-- Notes will be loaded here -->
         </div>
@@ -1041,14 +1044,14 @@
         })
             .then(response => response.json())
             .then(data => {
-                if (data.message === 'User created successfully' && data.token) {  // ← Проверяем токен
+                if (data.message === 'User created successfully' && data.token) {
                     showTerminal('ACCESS GRANTED. Account created successfully...');
                     currentUser = username;
 
-                    // Save to localStorage С ТОКЕНОМ
+                    // Save to localStorage
                     localStorage.setItem('userEmail', email);
                     localStorage.setItem('userName', username);
-                    localStorage.setItem('authToken', data.token);  // ← ВАЖНО: сохраняем РЕАЛЬНЫЙ токен!
+                    localStorage.setItem('authToken', data.token);
                     localStorage.setItem('isAuthenticated', 'true');
 
                     setTimeout(() => {
@@ -1059,7 +1062,22 @@
                         loadNotes();
                     }, 1000);
                 } else {
-                    showTerminal('REGISTRATION FAILED: ' + data.message);
+
+                    let errorMessage = 'REGISTRATION FAILED: ';
+
+                    if (data.validationErrors) {
+
+                        const errors = Object.entries(data.validationErrors)
+                            .map(([field, msg]) => `${field}: ${msg}`)
+                            .join('\n• ');
+                        errorMessage += '\n• ' + errors;
+                    } else if (data.message) {
+                        errorMessage += data.message;
+                    } else {
+                        errorMessage += 'Unknown error';
+                    }
+
+                    showTerminal(errorMessage);
                 }
             })
             .catch(error => {
@@ -1090,9 +1108,40 @@
     }
 
     function loadDashboardStats() {
-        // Load stats from API
-        fetch('/api/stats')
-            .then(response => response.json())
+        const token = localStorage.getItem('authToken');
+
+        // Проверяем есть ли токен
+        if (!token || token === 'oauth2-session') {
+            console.log('No JWT token, using session-based auth');
+        }
+
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        if (token && token !== 'oauth2-session' && token !== 'session-active') {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        fetch('/api/stats', {
+            method: 'GET',
+            headers: headers,
+            credentials: 'include'
+        })
+            .then(response => {
+
+                if (!response.ok) {
+                    console.error('Stats request failed:', response.status, response.statusText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Response is not JSON (got ' + contentType + ')');
+                }
+
+                return response.json();
+            })
             .then(data => {
                 if (data.adsBlocked !== undefined) {
                     document.getElementById('dashboardAdsBlocked').textContent =
@@ -1109,7 +1158,6 @@
             })
             .catch(error => {
                 console.error('Failed to load stats:', error);
-                // Set defaults on error
                 document.getElementById('dashboardAdsBlocked').textContent = '0';
                 document.getElementById('dashboardTrackersBlocked').textContent = '0';
                 document.getElementById('dashboardTimeSaved').textContent = '0.0h';
@@ -1179,7 +1227,7 @@
     function loadNotes() {
         const notesList = document.getElementById('notesList');
         if (!notesList) return;
-        
+
         notesList.innerHTML = '<div style="text-align: center; opacity: 0.5; padding: 20px;">Loading notes...</div>';
 
         fetch('/notes', {
@@ -1216,7 +1264,7 @@
     function createNoteElement(note) {
         const div = document.createElement('div');
         div.className = 'note-item';
-        
+
         const date = new Date(note.createdAt || note.updatedAt);
         const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
 

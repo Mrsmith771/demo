@@ -6,6 +6,8 @@ import com.example.demo.security.MyUserDetailsService;
 import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +21,9 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    // Logger instead System.out.println
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -42,10 +47,10 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        // ВАЖНО: Инвалидируем старую OAuth2 сессию
+        // Clear OAuth2 session
         HttpSession session = request.getSession(false);
         if (session != null) {
-            System.out.println("Invalidating existing session for JWT login");
+            logger.debug("Invalidating existing session for JWT login");
             session.invalidate();
         }
         SecurityContextHolder.clearContext();
@@ -65,10 +70,15 @@ public class AuthController {
                 response.put("email", email);
                 response.put("username", user.getUsername());
 
-                System.out.println("JWT login successful for: " + email + ", token: " + token.substring(0, 20) + "...");
+                // token
+                logger.info("Successful login for user: {}", email);
+
                 return ResponseEntity.ok(response);
             }
         }
+
+        // failed login attempts
+        logger.warn("Failed login attempt for email: {}", email);
 
         response.put("message", "Invalid credentials");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
